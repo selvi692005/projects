@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food Delivery Website</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: #f9f9f9;
+    }
+
+    header {
+      background: #ff4b2b;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1000px;
+      margin: 20px auto;
+    }
+
+    .restaurant-list,
+    .menu,
+    .cart {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 25px;
+    }
+
+    h2 {
+      color: #ff4b2b;
+      margin-bottom: 15px;
+    }
+
+    .restaurant {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+    }
+
+    .restaurant button {
+      background-color: #ff4b2b;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .restaurant button:hover {
+      background-color: #e63e22;
+    }
+
+    .menu-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .item {
+      background-color: #fff7f6;
+      border-radius: 10px;
+      text-align: center;
+      padding: 15px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .item:hover {
+      transform: scale(1.03);
+    }
+
+    .item img {
+      width: 100%;
+      height: 150px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .item h4 {
+      margin: 10px 0 5px;
+      color: #ff4b2b;
+    }
+
+    .item p {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .item button {
+      background-color: #ff4b2b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    .back-btn {
+      background: #ccc;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 14px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    .cart-items {
+      list-style: none;
+      margin-bottom: 10px;
+    }
+
+    .cart-items li {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    #total {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    #placeOrder {
+      width: 100%;
+      background-color: #ff4b2b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .menu-items {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>🍴 Food Delivery Website</header>
+
+  <div class="container">
+    <!-- Restaurant List -->
+    <div class="restaurant-list" id="restaurantList">
+      <h2>Choose a Restaurant</h2>
+      <div class="restaurant">
+        <span>🍕 Pizza Palace</span>
+        <button onclick="showMenu('pizza')">View Menu</button>
+      </div>
+      <div class="restaurant">
+        <span>🍔 Burger Junction</span>
+        <button onclick="showMenu('burger')">View Menu</button>
+      </div>
+      <div class="restaurant">
+        <span>🥗 Green Delight</span>
+        <button onclick="showMenu('healthy')">View Menu</button>
+      </div>
+    </div>
+
+    <!-- Menu Section -->
+    <div class="menu" id="menu" style="display: none;">
+      <h2 id="menuTitle"></h2>
+      <div class="menu-items" id="menuItems"></div>
+      <button class="back-btn" onclick="backToRestaurants()">⬅ Back to Restaurants</button>
+    </div>
+
+    <!-- Cart Section -->
+    <div class="cart" id="cart">
+      <h2>Your Cart</h2>
+      <ul class="cart-items" id="cartItems"></ul>
+      <p id="total">Total: ₹0</p>
+      <button id="placeOrder" onclick="placeOrder()">Place Order</button>
+      <p id="message"></p>
+    </div>
+  </div>
+
+  <script>
+    // Restaurant Menus
+    const restaurants = {
+      pizza: [
+        { name: "Margherita Pizza", price: 250, img: "https://images.unsplash.com/photo-1601924928383-3e7e96c3c7ea" },
+        { name: "Pepperoni Pizza", price: 300, img: "https://images.unsplash.com/photo-1605478371310-58bdb2a59b0d" },
+        { name: "Veggie Pizza", price: 270, img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38" }
+      ],
+      burger: [
+        { name: "Cheese Burger", price: 180, img: "https://images.unsplash.com/photo-1606755962773-d324e0c0a0b3" },
+        { name: "Double Patty Burger", price: 220, img: "https://images.unsplash.com/photo-1550547660-d9450f859349" },
+        { name: "Chicken Burger", price: 210, img: "https://images.unsplash.com/photo-1606755962773-d324e0c0a0b3" }
+      ],
+      healthy: [
+        { name: "Caesar Salad", price: 150, img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c" },
+        { name: "Quinoa Bowl", price: 200, img: "https://images.unsplash.com/photo-1572441710534-680b29d7b1e4" },
+        { name: "Fruit Smoothie", price: 120, img: "https://images.unsplash.com/photo-1576402187877-0f3c6e7c1f3d" }
+      ]
+    };
+
+    let cart = [];
+    let total = 0;
+
+    function showMenu(type) {
+      document.getElementById("restaurantList").style.display = "none";
+      document.getElementById("menu").style.display = "block";
+      const menuTitle = document.getElementById("menuTitle");
+      const menuItems = document.getElementById("menuItems");
+      menuTitle.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} Menu`;
+      menuItems.innerHTML = "";
+
+      restaurants[type].forEach(item => {
+        const div = document.createElement("div");
+        div.classList.add("item");
+        div.innerHTML = `
+          <img src="${item.img}" alt="${item.name}">
+          <h4>${item.name}</h4>
+          <p>₹${item.price}</p>
+          <button onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button>
+        `;
+        menuItems.appendChild(div);
+      });
+    }
+
+    function backToRestaurants() {
+      document.getElementById("menu").style.display = "none";
+      document.getElementById("restaurantList").style.display = "block";
+    }
+
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      total += price;
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById("cartItems");
+      cartItems.innerHTML = "";
+      cart.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - ₹${item.price}`;
+        cartItems.appendChild(li);
+      });
+      document.getElementById("total").textContent = `Total: ₹${total}`;
+    }
+
+    function placeOrder() {
+      const message = document.getElementById("message");
+      if (cart.length === 0) {
+        message.textContent = "🛒 Your cart is empty!";
+        message.style.color = "red";
+        return;
+      }
+      message.textContent = "✅ Order placed successfully! Your food is being prepared 🚴‍♂️💨";
+      message.style.color = "green";
+      cart = [];
+      total = 0;
+      updateCart();
+    }
+  </script>
+</body>
+</html>
